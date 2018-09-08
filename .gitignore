@@ -1,0 +1,15 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+*.jl~
+
+docs/build/
+docs/site/
+
+_local/
+_*.dat
+.ipynb_checkpoints/
+.vscode/
+*.ipynb_checkpoints
+**/*.ipynb_checkpoints
+**/**/*.ipynb_checkpoints
