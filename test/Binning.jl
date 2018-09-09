@@ -1,8 +1,8 @@
-include("../Binning.jl")
+using SSE
 using Test
 
 @testset "binning" begin
-    sb = SSEBin(10, Float64, Int32)
+    sb = DynamicBin(10, Float64, Int32)
     @test length(sb) == 0
     for i = 1:10
         push!(sb, (2.3, 3))

@@ -1,38 +1,37 @@
-###################### Spin Configuration ####################
-const SSESpins = Matrix{Int16}
+const PISpins = Matrix{Int16}
 
 """
 generate a random spin configuration.
 """
-rand_spins(nsite::Int, ntau::Int) = rand([-Int16(1), Int16(1)], nsite, ntau)
+rand_pispins(nsite::Int, ntau::Int) = rand([-Int16(1), Int16(1)], nsite, ntau)
 
 """
 number of imaginary time slice.
 """
-ntau(spins::SSESpins) = size(spins, 2)
+ntau(spins::PISpins) = size(spins, 2)
 
-nsite(spins::SSESpins) = size(spins, 1)
+nsite(spins::PISpins) = size(spins, 1)
 
 """
-    flip!(spins::SSESpins, i::Int, j::Int) -> SSESpins
+    flip!(spins::PISpins, i::Int, j::Int) -> PISpins
 
 flip a spin at specific position inplace.
 """
-flip!(spins::SSESpins, i::Int, j::Int) = (spins[i, j] = -spins[i, j]; spins)
+flip!(spins::PISpins, i::Int, j::Int) = (spins[i, j] = -spins[i, j]; spins)
 
 """
-    SSEIter{MT<:AbstractModel}
-    SSEIter(model::MT, spins::SSESpins) where {MT<:AbstractModel} -> SSEIter{MT}
+    PathIntegralIter{MT<:AbstractModel}
+    PathIntegralIter(model::MT, spins::PISpins) where {MT<:AbstractModel} -> PathIntegralIter{MT}
 
-An iterator for sweeps in SSE.
+An iterator for sweeps in Path Integral MonteCarlo.
 """
-struct SSEIter{MT<:AbstractModel}
+struct PathIntegralIter{MT<:AbstractModel}
     model::MT
-    spins::SSESpins
-    SSEIter(model::MT, spins::SSESpins) where {MT<:AbstractModel} = new{MT}(model, spins)
+    spins::PISpins
+    PathIntegralIter(model::MT, spins::PISpins) where {MT<:AbstractModel} = new{MT}(model, spins)
 end
 
-function Base.iterate(si::SSEIter, state::Int=1)
+function Base.iterate(si::PathIntegralIter, state::Int=1)
     model = si.model
     spins = si.spins
     lt = model.lattice
@@ -64,11 +63,11 @@ function Base.iterate(si::SSEIter, state::Int=1)
 end
 
 """
-    measure(model::AbstractModel, spins::SSESpins) -> Tuple
+    measure(model::AbstractModel, spins::PISpins) -> Tuple
 
 Measure observables, returns a tuple of (E, Mz, Mz², Mz⁴).
 """
-function measure(model::AbstractModel, spins::SSESpins)
+function measure(model::AbstractModel, spins::PISpins)
     lt = model.lattice
     NN = nsite(lt)
     NTAU = ntau(spins)
@@ -96,17 +95,14 @@ end
 """
     runsse(sseiter, ntherm::Int, nmeas::Int; binsize::Int=200, seed::Int=2) -> DynamicBin
 
-Run an SSE application for calculating mean energy and magnetization, where
-    * sseiter: SSEIter instance.
+Run an PathIntegralIter application for calculating mean energy and magnetization, where
+    * sseiter: PathIntegralIter instance.
     * ntherm: number of steps for heat bath.
     * nmeas: number of measures.
     * binsize: size of bin.
-    * seed: seed for RNG.
 """
-function runsse(sseiter, ntherm::Int, nmeas::Int; binsize::Int=200, seed::Int=2)
-    Random.seed!(seed)
-
-    println("thermalizing, seed = $seed ...")
+function runsse(sseiter, ntherm::Int, nmeas::Int; binsize::Int=200)
+    println("thermalizing ...")
     for (k, model, spins) in sseiter
         k == ntherm && break
     end

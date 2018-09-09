@@ -1,4 +1,4 @@
-include("../Lattice.jl")
+using SSE
 using Test
 
 @testset "lattice" begin
