@@ -6,7 +6,7 @@ This project is a transription of Stephan Humeniuk's excellent Fortran code. It 
 The framework is designed for extensibility.
 
 ## How to use
-(under development, think before using it)
+(SSE is under development, this is just simplest path integral version, think before using it)
 ```
 julia main.jl
 ```
